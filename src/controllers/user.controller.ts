@@ -1,14 +1,7 @@
 import {Request, Response} from 'express';
 import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
 import {UserModel} from '../models/user.model'; // Ensure correct import path for UserModel
-
-// Function to generate JWT token
-const generateToken = (userId: string): string => {
-  return jwt.sign({id: userId}, process.env.JWT_SECRET as string, {
-    expiresIn: '1h',
-  }); // adjust the expiry as needed
-};
+import {generateToken} from '../utils/generateToken';
 
 // Register User
 export const register = async (req: Request, res: Response): Promise<void> => {
@@ -47,10 +40,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
     // Save to DB
     await user.save();
 
-    // Generate token
-    const token = generateToken(user._id.toString());
-
-    res.status(201).json({success: true, data: {user, token}});
+    res.status(201).json({success: true, message: 'User created successfully'});
   } catch (error: any) {
     res.status(500).json({
       success: false,
@@ -105,8 +95,7 @@ export const getProfile = async (
   res: Response,
 ): Promise<void> => {
   try {
-    const userId = req.user._id; // Assuming this is set by middleware during authentication
-
+    const userId = req.user.id;
     // Find user by ID
     const user = await UserModel.findById(userId);
     if (!user) {

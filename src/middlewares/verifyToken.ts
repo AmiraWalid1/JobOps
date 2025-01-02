@@ -19,9 +19,10 @@ export const protect = async (
   }
 
   if (!token) {
-    return res
+    res
       .status(401)
       .json({success: false, message: 'No token, authorization denied'});
+    return;
   }
 
   try {
@@ -34,21 +35,17 @@ export const protect = async (
     // Find user by decoded id (this assumes the payload contains user id)
     const user = await UserModel.findById(decoded.id);
     if (!user) {
-      return res.status(404).json({success: false, message: 'User not found'});
+      res.status(404).json({success: false, message: 'User not found'});
+      return;
     }
 
     // Attach the user to the request object
     req.user = {
-      _id: user._id.toString(),
-      email: user.email,
-      name: user.name,
-      Role: user.Role,
-      Rate: user.Rate,
-      phoneNumber: user.phoneNumber,
+      id: user.id.toString(),
     };
 
     // Proceed to the next middleware/route handler
-    next();
+    return next();
   } catch (error) {
     res.status(401).json({success: false, message: 'Token is not valid'});
   }
