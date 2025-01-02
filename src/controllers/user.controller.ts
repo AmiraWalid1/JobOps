@@ -1,95 +1,7 @@
 import {Request, Response} from 'express';
-import bcrypt from 'bcrypt';
-import {UserModel} from '../models/user.model'; // Ensure correct import path for UserModel
-import {generateToken} from '../utils/generateToken';
+import {UserModel} from '../models/user.model';
 
-// Register User
-export const register = async (req: Request, res: Response): Promise<void> => {
-  try {
-    const {name, email, password, Rate, Role, phoneNumber} = req.body;
-
-    // Input Validation
-    if (!name || !email || !password) {
-      res
-        .status(400)
-        .json({success: false, message: 'Please provide all required fields'});
-      return;
-    }
-
-    // Check if the email is already in use
-    const existingUser = await UserModel.findOne({email});
-    if (existingUser) {
-      res.status(400).json({success: false, message: 'Email already in use'});
-      return;
-    }
-
-    // Hash Password
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
-
-    // Create new user
-    const user = new UserModel({
-      name,
-      email,
-      password: hashedPassword,
-      Rate,
-      Role,
-      phoneNumber,
-    });
-
-    // Save to DB
-    await user.save();
-
-    res.status(201).json({success: true, message: 'User created successfully'});
-  } catch (error: any) {
-    res.status(500).json({
-      success: false,
-      message: error.message || 'Internal server error',
-    });
-  }
-};
-
-// Login User
-export const login = async (req: Request, res: Response): Promise<void> => {
-  try {
-    const {email, password} = req.body;
-
-    // Validate input
-    if (!email || !password) {
-      res
-        .status(400)
-        .json({success: false, message: 'Email and password are required'});
-      return;
-    }
-
-    // Find user by email
-    const user = await UserModel.findOne({email});
-    if (!user) {
-      res.status(404).json({success: false, message: 'User not found'});
-      return;
-    }
-
-    // Compare password
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      res.status(400).json({success: false, message: 'Invalid credentials'});
-      return;
-    }
-
-    // Generate JWT Token
-    const token = generateToken(user._id.toString());
-
-    // Send response with token
-    res.status(200).json({success: true, token});
-  } catch (error: any) {
-    res.status(500).json({
-      success: false,
-      message: error.message || 'Internal server error',
-    });
-  }
-};
-
-// Get Profile (Authenticated User)
+// getProfile (Authenticated User)
 export const getProfile = async (
   req: Request,
   res: Response,
@@ -105,6 +17,64 @@ export const getProfile = async (
 
     // Respond with user data
     res.status(200).json({success: true, data: user});
+  } catch (error: unknown) {
+    const errorMessage =
+      error instanceof Error ? error.message : 'Internal server error';
+    res.status(500).json({success: false, message: errorMessage});
+  }
+};
+
+// Update Profile (Authenticated User)
+export const updateProfile = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
+  try {
+    const userId = req.user.id;
+    const {name, email, Rate, Role, phoneNumber} = req.body;
+
+    // Find user by ID
+    const user = await UserModel.findById(userId);
+    if (!user) {
+      res.status(404).json({success: false, message: 'User not found'});
+      return;
+    }
+
+    // Update user data
+    user.name = name || user.name;
+    user.email = email || user.email;
+    user.Rate = Rate || user.Rate;
+    user.Role = Role || user.Role;
+    user.phoneNumber = phoneNumber || user.phoneNumber;
+
+    // Save updated user data
+    await user.save();
+
+    // Respond with updated user data
+    res.status(200).json({success: true, data: user});
+  } catch (error: unknown) {
+    const errorMessage =
+      error instanceof Error ? error.message : 'Internal server error';
+    res.status(500).json({success: false, message: errorMessage});
+  }
+};
+
+// Delete User (Authenticated User)
+export const deleteUser = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
+  try {
+    const userId = req.user.id;
+    // Find user by ID and delete
+    const user = await UserModel.findByIdAndDelete(userId);
+    if (!user) {
+      res.status(404).json({success: false, message: 'User not found'});
+      return;
+    }
+
+    // Respond with success message
+    res.status(200).json({success: true, message: 'User deleted successfully'});
   } catch (error: unknown) {
     const errorMessage =
       error instanceof Error ? error.message : 'Internal server error';

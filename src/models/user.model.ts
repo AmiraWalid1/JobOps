@@ -19,6 +19,9 @@ export class User {
 
   @prop({required: true})
   public phoneNumber!: string;
+
+  @prop({default: Date.now()})
+  public createdAt!: Date;
 }
 
 // إنشاء الـ model
