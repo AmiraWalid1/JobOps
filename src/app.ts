@@ -2,7 +2,8 @@ require('dotenv').config();
 import express from 'express';
 import {connectDB} from './utils/db';
 import userRoutes from './routes/user.routes';
-// import errorHandler from './middleware/errorHandler';
+import {errorHandler} from './middlewares/error.middleware';
+import cookieParser from 'cookie-parser';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -12,10 +13,13 @@ void connectDB();
 
 // middleware
 app.use(express.json());
-// app.use(errorHandler);
+app.use(cookieParser());
 
 // routes
 app.use('/api/users', userRoutes);
+
+// error handler
+app.use(errorHandler);
 
 // server
 app.listen(PORT, () => {
