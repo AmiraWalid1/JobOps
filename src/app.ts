@@ -3,6 +3,7 @@ import express from 'express';
 import {connectDB} from './utils/db';
 import userRoutes from './routes/user.routes';
 import jobRoutes from './routes/job.routes';
+import applicationRoutes from './routes/application.routes';
 import {errorHandler} from './middlewares/error.middleware';
 import cookieParser from 'cookie-parser';
 
@@ -19,6 +20,7 @@ app.use(cookieParser());
 // routes
 app.use('/api/users', userRoutes);
 app.use('/api/jobs', jobRoutes);
+app.use('/api/applications', applicationRoutes);
 
 // error handler
 app.use(errorHandler);
