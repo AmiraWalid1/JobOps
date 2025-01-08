@@ -33,6 +33,7 @@ export const getJobById = async (req: Request, res: Response, next: NextFunction
 
         if (!job) {
             res.status(404).json({ message: 'Job not found' });
+            return;
         }
 
         res.status(200).json(job);
@@ -49,6 +50,7 @@ export const updateJob = async (req: Request, res: Response, next: NextFunction)
 
         if (!updatedJob) {
             res.status(404).json({ message: 'Job not found' });
+            return;
         }
 
         res.status(200).json({ message: 'Job updated successfully', job: updatedJob });
@@ -65,6 +67,7 @@ export const deleteJob = async (req: Request, res: Response, next: NextFunction)
         
         if (!deletedJob) {
             res.status(404).json({ message: 'Job not found' });
+            return;
         }
 
         res.status(200).json({ message: 'Job deleted successfully' });
