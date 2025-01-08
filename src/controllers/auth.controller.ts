@@ -1,26 +1,22 @@
 import {generateToken} from '../utils/generateToken';
 import bcrypt from 'bcrypt';
-import {Request, Response} from 'express';
+import {NextFunction, Request, Response} from 'express';
 import {UserModel} from '../models/user.model';
+import {CustomError} from '../utils/customError';
 
 // Register User
-export const register = async (req: Request, res: Response): Promise<void> => {
+export const register = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> => {
   try {
     const {name, email, password, Rate, Role, phoneNumber} = req.body;
 
-    // Input Validation
-    if (!name || !email || !password) {
-      res
-        .status(400)
-        .json({success: false, message: 'Please provide all required fields'});
-      return;
-    }
-
     // Check if the email is already in use
-    const existingUser = await UserModel.findOne({email});
+    const existingUser = await UserModel.findOne({email}).select('-password');
     if (existingUser) {
-      res.status(400).json({success: false, message: 'Email already in use'});
-      return;
+      throw new CustomError(400, 'User with this email already exists');
     }
 
     // Hash Password
@@ -40,40 +36,35 @@ export const register = async (req: Request, res: Response): Promise<void> => {
     // Save to DB
     await user.save();
 
-    res.status(201).json({success: true, message: 'User created successfully'});
-  } catch (error: any) {
-    res.status(500).json({
-      success: false,
-      message: error.message || 'Internal server error',
+    res.status(201).json({
+      success: true,
+      message: 'User created successfully',
+      data: {user},
     });
+  } catch (error: unknown) {
+    next(error);
   }
 };
 
 // Login User
-export const login = async (req: Request, res: Response): Promise<void> => {
+export const login = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> => {
   try {
     const {email, password} = req.body;
-
-    // Validate input
-    if (!email || !password) {
-      res
-        .status(400)
-        .json({success: false, message: 'Email and password are required'});
-      return;
-    }
 
     // Find user by email
     const user = await UserModel.findOne({email});
     if (!user) {
-      res.status(404).json({success: false, message: 'User not found'});
-      return;
+      throw new CustomError(400, 'Invalid credentials');
     }
 
     // Compare password
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      res.status(400).json({success: false, message: 'Invalid credentials'});
-      return;
+      throw new CustomError(400, 'Invalid credentials');
     }
 
     // Generate JWT Token
@@ -81,14 +72,13 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     res.cookie('token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 24 * 60 * 60 * 1000,
     });
 
     // Send response with token
-    res.status(200).json({success: true, token});
-  } catch (error: any) {
-    res.status(500).json({
-      success: false,
-      message: error.message || 'Internal server error',
-    });
+    res.status(200).json({success: true, token, data: {user}});
+  } catch (error: unknown) {
+    next(error);
   }
 };

@@ -1,26 +1,25 @@
-import {Request, Response} from 'express';
+import {NextFunction, Request, Response} from 'express';
 import {UserModel} from '../models/user.model';
+import {CustomError} from '../utils/customError';
 
 // getProfile (Authenticated User)
 export const getProfile = async (
   req: Request,
   res: Response,
+  next: NextFunction,
 ): Promise<void> => {
   try {
     const userId = req.user.id;
     // Find user by ID
     const user = await UserModel.findById(userId);
     if (!user) {
-      res.status(404).json({success: false, message: 'User not found'});
-      return;
+      throw new CustomError(404, 'User not found');
     }
 
     // Respond with user data
     res.status(200).json({success: true, data: user});
   } catch (error: unknown) {
-    const errorMessage =
-      error instanceof Error ? error.message : 'Internal server error';
-    res.status(500).json({success: false, message: errorMessage});
+    next(error);
   }
 };
 
@@ -28,6 +27,7 @@ export const getProfile = async (
 export const updateProfile = async (
   req: Request,
   res: Response,
+  next: NextFunction,
 ): Promise<void> => {
   try {
     const userId = req.user.id;
@@ -36,8 +36,7 @@ export const updateProfile = async (
     // Find user by ID
     const user = await UserModel.findById(userId);
     if (!user) {
-      res.status(404).json({success: false, message: 'User not found'});
-      return;
+      throw new CustomError(404, 'User not found');
     }
 
     // Update user data
@@ -53,9 +52,7 @@ export const updateProfile = async (
     // Respond with updated user data
     res.status(200).json({success: true, data: user});
   } catch (error: unknown) {
-    const errorMessage =
-      error instanceof Error ? error.message : 'Internal server error';
-    res.status(500).json({success: false, message: errorMessage});
+    next(error);
   }
 };
 
@@ -63,21 +60,19 @@ export const updateProfile = async (
 export const deleteUser = async (
   req: Request,
   res: Response,
+  next: NextFunction,
 ): Promise<void> => {
   try {
     const userId = req.user.id;
     // Find user by ID and delete
     const user = await UserModel.findByIdAndDelete(userId);
     if (!user) {
-      res.status(404).json({success: false, message: 'User not found'});
-      return;
+      throw new CustomError(404, 'User not found');
     }
 
     // Respond with success message
     res.status(200).json({success: true, message: 'User deleted successfully'});
   } catch (error: unknown) {
-    const errorMessage =
-      error instanceof Error ? error.message : 'Internal server error';
-    res.status(500).json({success: false, message: errorMessage});
+    next(error);
   }
 };

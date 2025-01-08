@@ -1,6 +1,7 @@
 import {Request, Response, NextFunction} from 'express';
 import jwt from 'jsonwebtoken';
-import {UserModel} from '../models/user.model'; // Ensure correct import for UserModel
+import {UserModel} from '../models/user.model';
+import {CustomError} from '../utils/customError';
 
 // Middleware to verify JWT and attach the user to req.user
 export const protect = async (
@@ -19,10 +20,7 @@ export const protect = async (
   }
 
   if (!token) {
-    res
-      .status(401)
-      .json({success: false, message: 'No token, authorization denied'});
-    return;
+    throw new CustomError(401, 'Not authorized to access this route');
   }
 
   try {
@@ -35,8 +33,7 @@ export const protect = async (
     // Find user by decoded id (this assumes the payload contains user id)
     const user = await UserModel.findById(decoded.id);
     if (!user) {
-      res.status(404).json({success: false, message: 'User not found'});
-      return;
+      throw new CustomError(404, 'User not found');
     }
 
     // Attach the user to the request object
@@ -47,6 +44,6 @@ export const protect = async (
     // Proceed to the next middleware/route handler
     return next();
   } catch (error) {
-    res.status(401).json({success: false, message: 'Token is not valid'});
+    next(new CustomError(401, 'Not authorized to access this route'));
   }
 };
