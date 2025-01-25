@@ -6,6 +6,7 @@ import jobRoutes from './routes/job.routes';
 import applicationRoutes from './routes/application.routes';
 import {errorHandler} from './middlewares/error.middleware';
 import cookieParser from 'cookie-parser';
+import reviewRoutes from './routes/review.routes';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -21,6 +22,7 @@ app.use(cookieParser());
 app.use('/api/users', userRoutes);
 app.use('/api/jobs', jobRoutes);
 app.use('/api/applications', applicationRoutes);
+app.use('/api/reviews', reviewRoutes);
 
 // error handler
 app.use(errorHandler);

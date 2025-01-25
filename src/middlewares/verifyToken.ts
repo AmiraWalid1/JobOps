@@ -9,21 +9,20 @@ export const protect = async (
   res: Response,
   next: NextFunction,
 ) => {
-  let token: string | undefined;
-
-  // Check for token in the Authorization header
-  if (
-    req.headers.authorization &&
-    req.headers.authorization.startsWith('Bearer ')
-  ) {
-    token = req.headers.authorization.split(' ')[1];
-  }
-
-  if (!token) {
-    throw new CustomError(401, 'Not authorized to access this route');
-  }
-
   try {
+    let token: string | undefined;
+
+    // Check for token in the Authorization header
+    if (
+      req.headers.authorization &&
+      req.headers.authorization.startsWith('Bearer ')
+    ) {
+      token = req.headers.authorization.split(' ')[1];
+    }
+
+    if (!token) {
+      throw new CustomError(401, 'Not authorized to access this route');
+    }
     // Verify the token using secret key
     const decoded = jwt.verify(
       token,
