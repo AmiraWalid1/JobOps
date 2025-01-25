@@ -1,10 +1,10 @@
 import {NextFunction, Request, Response, RequestHandler} from 'express';
 import {AnyZodObject} from 'zod';
 
-export const validate = (schema: AnyZodObject): RequestHandler => {
+export const validate = (schema: AnyZodObject, type: 'body' | 'query' | 'params' = 'body'): RequestHandler => {
   return (req: Request, res: Response, next: NextFunction): void => {
     try {
-      schema.parse(req.body); // Parse and validate the body
+      schema.parse(req[type]); // Parse and validate the body
       next(); // Call the next middleware/controller
     } catch (error) {
       if (error instanceof Error) {
