@@ -1,10 +1,10 @@
 import express from 'express';
-import { 
-    createJob, 
-    getAllJobs, 
-    getJobById, 
-    updateJob, 
-    deleteJob 
+import {
+  createJob,
+  getAllJobs,
+  getJobById,
+  updateJob,
+  deleteJob,
 } from '../controllers/job.controller';
 
 const router = express.Router();

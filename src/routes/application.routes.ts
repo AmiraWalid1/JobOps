@@ -1,12 +1,12 @@
 import express from 'express';
 import {
-    createApplication,
-    getAllApplications,
-    getApplicationById,
-    updateApplicationStatus,
-    deleteApplication,
-    getApplicationsByStatus,
-    getApplicationsBySeeker,
+  createApplication,
+  getAllApplications,
+  getApplicationById,
+  updateApplicationStatus,
+  deleteApplication,
+  getApplicationsByStatus,
+  getApplicationsBySeeker,
 } from '../controllers/application.controller';
 
 const router = express.Router();
