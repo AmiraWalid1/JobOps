@@ -15,10 +15,10 @@ import {
 
 const router = express.Router();
 
-router.post('/register', validate(userSchema), register);
-router.post('/login', validate(loginSchema), login);
+router.post('/register', validate(userSchema, "body"), register);
+router.post('/login', validate(loginSchema, "body"), login);
 router.get('/profile', protect, getProfile);
-router.put('/profile', protect, validate(updateUserSchema), updateProfile);
+router.put('/profile', protect, validate(updateUserSchema, "body"), updateProfile);
 router.delete('/profile', protect, deleteUser);
 
 export default router;
