@@ -9,8 +9,7 @@ export const createApplicationSchema = z.object({
 });
 
 export const updateApplicationSchema = z.object({
-    cv: z.string().nonempty('CV is required'),
-    status: z.string().optional(),
+    status: z.string().nonempty('status is required')
 });
 
 export const getApplicationsByStatusSchema = z.object({

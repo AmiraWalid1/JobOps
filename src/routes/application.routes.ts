@@ -38,6 +38,6 @@ router.get('/:id', protect, getApplicationById);
 router.put('/:id',  protect, validate(updateApplicationSchema, 'body'), updateApplicationStatus);
 
 // Route to delete an application by ID
-router.delete('/:id', deleteApplication);
+router.delete('/:id', protect, deleteApplication);
 
 export default router;
