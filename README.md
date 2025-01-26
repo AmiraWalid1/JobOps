@@ -181,9 +181,10 @@ src/
 ```json
 POST /api/register
 {
-  "name": "John Doe",
-  "email": "john@example.com",
-  "password": "password123"
+  "name": "Haidy",
+  "email": "haidy@gmail.com",
+  "password": "password123",
+  "phoneNumber": "1234567890"
 }
 ```
 
@@ -191,10 +192,20 @@ POST /api/register
 
 ```json
 {
-  "_id": "64f1c9e8e4b0f5a2d8e4f1c9",
-  "name": "John Doe",
-  "email": "john@example.com",
-  "createdAt": "2023-09-05T12:00:00.000Z"
+  "success": true,
+  "message": "User created successfully",
+  "data": {
+    "user": {
+      "name": "haidy",
+      "email": "haidy@gmail.com",
+      "password": "$2b$10$b6vPeS4ZxTCplIpwxlUe0eh7jm8VMxN2LAdsGD.tC.JooE8b9cSy6",
+      "Role": "seeker",
+      "phoneNumber": "1234564568",
+      "createdAt": "2025-01-26T22:34:47.272Z",
+      "_id": "6796b96f30f7b977adc53555",
+      "__v": 0
+    }
+  }
 }
 ```
 
@@ -236,7 +247,6 @@ POST /api/jobs
 ```json
 POST /api/reviews
 {
-  "reviewerId": "64f1c9e8e4b0f5a2d8e4f1c9",
   "employerId": "64f1c9e8e4b0f5a2d8e4f1d0",
   "rating": 5,
   "comment": "Great employer to work with!"
@@ -247,12 +257,13 @@ POST /api/reviews
 
 ```json
 {
-  "_id": "64f1c9e8e4b0f5a2d8e4f1d2",
-  "reviewerId": "64f1c9e8e4b0f5a2d8e4f1c9",
-  "employerId": "64f1c9e8e4b0f5a2d8e4f1d0",
-  "rating": 5,
-  "comment": "Great employer to work with!",
-  "createdAt": "2023-09-05T12:00:00.000Z"
+  "reviewerId": "67955e5b43f5cf5b493ccb14",
+  "employerId": "679561d456c86b7efb835ed3",
+  "rating": 4,
+  "comment": "a good company",
+  "_id": "67956335b7b9bbc7a81d7c04",
+  "createdAt": "2025-01-25T22:18:29.074Z",
+  "__v": 0
 }
 ```
 
