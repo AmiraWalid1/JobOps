@@ -81,13 +81,13 @@ src/
 
 ### **1. User Management**
 
-| **Method** | **Endpoint**    | **Description**                          |
-| ---------- | --------------- | ---------------------------------------- |
-| POST       | `/api/register` | Register a new user.                     |
-| POST       | `/api/login`    | Log in and receive a JWT token.          |
-| GET        | `/api/profile`  | Fetch the authenticated user's profile.  |
-| PUT        | `/api/profile`  | Update the authenticated user's profile. |
-| DELETE     | `/api/profile`  | Delete the authenticated user's profile. |
+| **Method** | **Endpoint**          | **Description**                          |
+| ---------- | --------------------- | ---------------------------------------- |
+| POST       | `/api/users/register` | Register a new user.                     |
+| POST       | `/api/users/login`    | Log in and receive a JWT token.          |
+| GET        | `/api/users/profile`  | Fetch the authenticated user's profile.  |
+| PUT        | `/api/users/profile`  | Update the authenticated user's profile. |
+| DELETE     | `/api/users/profile`  | Delete the authenticated user's profile. |
 
 ---
 
