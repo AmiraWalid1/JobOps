@@ -1,111 +1,153 @@
-import {Request, Response, NextFunction} from 'express';
-import * as applicationService from '../services/application.service';
+import {NextFunction, Request, Response} from 'express';
+import {
+  createApplication,
+  getAllApplications,
+  getApplicationById,
+  updateApplicationStatus,
+  deleteApplication,
+  getApplicationsByStatus,
+  getApplicationsBySeeker,
+} from '../services/application.service';
+import {sendResponse} from '../utils/response.util';
 
-// Create a new application
-export const createApplication = async (
+export const createApplicationHandler = async (
   req: Request,
   res: Response,
   next: NextFunction,
 ): Promise<void> => {
   try {
-    const savedApplication = await applicationService.createApplication(req.body);
-    res.status(201).json({
-      message: 'Application created successfully',
-      application: savedApplication,
+    const {seekerId, jobId, cv, status} = req.body;
+
+    const application = await createApplication({seekerId, jobId, cv, status});
+    sendResponse(
+      res,
+      201,
+      true,
+      'Application created successfully',
+      application,
+    );
+  } catch (error: unknown) {
+    next(error);
+  }
+};
+
+export const getAllApplicationsHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> => {
+  try {
+    const applications = await getAllApplications();
+    sendResponse(
+      res,
+      200,
+      true,
+      'Applications retrieved successfully',
+      applications,
+    );
+  } catch (error: unknown) {
+    next(error);
+  }
+};
+
+export const getApplicationByIdHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> => {
+  try {
+    const applicationId = req.params.id;
+    const application = await getApplicationById(applicationId);
+    sendResponse(
+      res,
+      200,
+      true,
+      'Application retrieved successfully',
+      application,
+    );
+  } catch (error: unknown) {
+    next(error);
+  }
+};
+
+export const updateApplicationStatusHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> => {
+  try {
+    const applicationId = req.params.id;
+    const {status} = req.body;
+
+    const updatedApplication = await updateApplicationStatus(applicationId, {
+      status,
     });
-  } catch (err) {
-    next(err);
+    sendResponse(
+      res,
+      200,
+      true,
+      'Application status updated successfully',
+      updatedApplication,
+    );
+  } catch (error: unknown) {
+    next(error);
   }
 };
 
-// Get all applications
-export const getAllApplications = async (
+export const deleteApplicationHandler = async (
   req: Request,
   res: Response,
   next: NextFunction,
 ): Promise<void> => {
   try {
-    const applications = await applicationService.getAllApplications();
-    res.status(200).json(applications);
-  } catch (err) {
-    next(err);
+    const applicationId = req.params.id;
+    const result = await deleteApplication(applicationId);
+    sendResponse(res, 200, true, result.message);
+  } catch (error: unknown) {
+    next(error);
   }
 };
 
-// Get a specific application by ID
-export const getApplicationById = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-): Promise<void> => {
-  try {
-    const {id} = req.params;
-    const application = await applicationService.getApplicationById(id);
-    res.status(200).json(application);
-  } catch (err) {
-    next(err);
-  }
-};
-
-// Update an application by ID
-export const updateApplicationStatus = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-): Promise<void> => {
-  try {
-    const {id} = req.params;
-    const updatedApplication = await applicationService.updateApplicationStatus(id, req.body);
-    res.status(200).json({
-      message: 'Application updated successfully',
-      application: updatedApplication,
-    });
-  } catch (err) {
-    next(err);
-  }
-};
-
-// Delete an application by ID
-export const deleteApplication = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-): Promise<void> => {
-  try {
-    const {id} = req.params;
-    await applicationService.deleteApplication(id);
-    res.status(200).json({message: 'Application deleted successfully'});
-  } catch (err) {
-    next(err);
-  }
-};
-
-// Get applications by status
-export const getApplicationsByStatus = async (
+export const getApplicationsByStatusHandler = async (
   req: Request,
   res: Response,
   next: NextFunction,
 ): Promise<void> => {
   try {
     const {status} = req.query;
-    const applications = await applicationService.getApplicationsByStatus(status as string);
-    res.status(200).json(applications);
-  } catch (err) {
-    next(err);
+    if (typeof status !== 'string') {
+      throw new Error('Status query parameter must be a string');
+    }
+
+    const applications = await getApplicationsByStatus(status);
+    sendResponse(
+      res,
+      200,
+      true,
+      'Applications retrieved successfully',
+      applications,
+    );
+  } catch (error: unknown) {
+    next(error);
   }
 };
 
-// Get applications by seeker
-export const getApplicationsBySeeker = async (
+export const getApplicationsBySeekerHandler = async (
   req: Request,
   res: Response,
   next: NextFunction,
 ): Promise<void> => {
   try {
-    const {seekerId} = req.params;
-    const applications = await applicationService.getApplicationsBySeeker(seekerId);
-    res.status(200).json(applications);
-  } catch (err) {
-    next(err);
+    const seekerId = req.params.seekerId;
+    const applications = await getApplicationsBySeeker(seekerId);
+    sendResponse(
+      res,
+      200,
+      true,
+      'Applications retrieved successfully',
+      applications,
+    );
+  } catch (error: unknown) {
+    next(error);
   }
 };

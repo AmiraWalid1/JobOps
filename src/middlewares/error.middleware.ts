@@ -1,4 +1,5 @@
 import {Request, Response, NextFunction} from 'express';
+import {sendResponse} from '../utils/response.util';
 
 interface CustomError extends Error {
   statusCode?: number;
@@ -15,18 +16,15 @@ const defaultMessages: {[key: number]: string} = {
 // Error Handler Middleware
 export const errorHandler = (
   err: CustomError,
-  req: Request,
+  _req: Request,
   res: Response,
-  next: NextFunction,
+  _next: NextFunction,
 ) => {
   console.log('entered error handler');
   const statusCode = err.statusCode || 500;
-  const message = err.message || 'Something went wrong!';
+  const message =
+    err.message || defaultMessages[statusCode] || 'Something went wrong!';
   const errors = err.errors || [];
 
-  res.status(statusCode).json({
-    status: defaultMessages[statusCode],
-    message,
-    errors,
-  });
+  sendResponse(res, statusCode, false, message, null, errors);
 };

@@ -1,38 +1,55 @@
 import {JobModel} from '../models/job.model';
+import {CustomError} from '../utils/customError';
 
-export const createJob = async (jobData: any) => {
-  const newJob = new JobModel(jobData);
-  return await newJob.save();
-};
+export const createJob = async (
+  title: string,
+  description: string,
+  location: string,
+  salary: number,
+  employerId: string,
+) => {
+  const job = new JobModel({
+    title,
+    description,
+    location,
+    salary,
+    employerId,
+  });
 
-export const getAllJobs = async () => {
-  return await JobModel.find();
-};
-
-export const getJobById = async (id: string) => {
-  const job = await JobModel.findById(id);
-  if (!job) {
-    throw new Error('Job not found');
-  }
+  await job.save();
   return job;
 };
 
-export const updateJob = async (id: string, updateData: any) => {
-  const updatedJob = await JobModel.findByIdAndUpdate(id, updateData, {
-    new: true,
-  });
-
-  if (!updatedJob) {
-    throw new Error('Job not found');
-  }
-
-  return updatedJob;
+export const getJobs = async () => {
+  const jobs = await JobModel.find().populate('employerId');
+  return jobs;
 };
 
-export const deleteJob = async (id: string) => {
-  const deletedJob = await JobModel.findByIdAndDelete(id);
-  if (!deletedJob) {
-    throw new Error('Job not found');
-  }
-  return deletedJob;
+export const getJobById = async (jobId: string) => {
+  const job = await JobModel.findById(jobId).populate('employerId');
+  if (!job) throw new CustomError(404, 'Job not found');
+  return job;
+};
+
+export const updateJob = async (
+  jobId: string,
+  updateData: {
+    title?: string;
+    description?: string;
+    location?: string;
+    salary?: number;
+  },
+) => {
+  const job = await JobModel.findByIdAndUpdate(jobId, updateData, {
+    new: true,
+  }).populate('employerId');
+
+  if (!job) throw new CustomError(404, 'Job not found');
+  return job;
+};
+
+export const deleteJob = async (jobId: string) => {
+  const job = await JobModel.findByIdAndDelete(jobId);
+  if (!job) throw new CustomError(404, 'Job not found');
+  return {message: 'Job deleted successfully'};
 };
