@@ -1,5 +1,5 @@
 import {Request, Response, NextFunction} from 'express';
-import {JobModel} from '../models/job.model';
+import * as jobService from '../services/job.service';
 
 // Create a new job
 export const createJob = async (
@@ -8,8 +8,7 @@ export const createJob = async (
   next: NextFunction,
 ): Promise<void> => {
   try {
-    const newJob = new JobModel(req.body);
-    const savedJob = await newJob.save();
+    const savedJob = await jobService.createJob(req.body);
     res.status(201).json({
       message: 'Job created successfully',
       job: savedJob,
@@ -26,7 +25,7 @@ export const getAllJobs = async (
   next: NextFunction,
 ): Promise<void> => {
   try {
-    const jobs = await JobModel.find();
+    const jobs = await jobService.getAllJobs();
     res.status(200).json(jobs);
   } catch (err) {
     next(err);
@@ -41,13 +40,7 @@ export const getJobById = async (
 ): Promise<void> => {
   try {
     const {id} = req.params;
-    const job = await JobModel.findById(id);
-
-    if (!job) {
-      res.status(404).json({message: 'Job not found'});
-      return;
-    }
-
+    const job = await jobService.getJobById(id);
     res.status(200).json(job);
   } catch (error) {
     next(error);
@@ -62,18 +55,11 @@ export const updateJob = async (
 ): Promise<void> => {
   try {
     const {id} = req.params;
-    const updatedJob = await JobModel.findByIdAndUpdate(id, req.body, {
-      new: true,
+    const updatedJob = await jobService.updateJob(id, req.body);
+    res.status(200).json({
+      message: 'Job updated successfully',
+      job: updatedJob,
     });
-
-    if (!updatedJob) {
-      res.status(404).json({message: 'Job not found'});
-      return;
-    }
-
-    res
-      .status(200)
-      .json({message: 'Job updated successfully', job: updatedJob});
   } catch (error) {
     next(error);
   }
@@ -87,13 +73,7 @@ export const deleteJob = async (
 ): Promise<void> => {
   try {
     const {id} = req.params;
-    const deletedJob = await JobModel.findByIdAndDelete(id);
-
-    if (!deletedJob) {
-      res.status(404).json({message: 'Job not found'});
-      return;
-    }
-
+    await jobService.deleteJob(id);
     res.status(200).json({message: 'Job deleted successfully'});
   } catch (err) {
     next(err);
