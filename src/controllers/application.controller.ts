@@ -1,5 +1,5 @@
 import {Request, Response, NextFunction} from 'express';
-import {ApplicationModel} from '../models/application.model';
+import * as applicationService from '../services/application.service';
 
 // Create a new application
 export const createApplication = async (
@@ -8,23 +8,7 @@ export const createApplication = async (
   next: NextFunction,
 ): Promise<void> => {
   try {
-    const {seekerId, jobId, cv, status} = req.body;
-
-    // Validate required fields
-    if (!seekerId || !jobId || !cv) {
-      res.status(400).json({message: 'Missing required fields'});
-      return;
-    }
-
-    // Create and save the application
-    const newApplication = new ApplicationModel({
-      seekerId,
-      jobId,
-      cv,
-      status: status || 'pending', // Default status to "pending"
-    });
-
-    const savedApplication = await newApplication.save();
+    const savedApplication = await applicationService.createApplication(req.body);
     res.status(201).json({
       message: 'Application created successfully',
       application: savedApplication,
@@ -41,7 +25,7 @@ export const getAllApplications = async (
   next: NextFunction,
 ): Promise<void> => {
   try {
-    const applications = await ApplicationModel.find();
+    const applications = await applicationService.getAllApplications();
     res.status(200).json(applications);
   } catch (err) {
     next(err);
@@ -56,13 +40,7 @@ export const getApplicationById = async (
 ): Promise<void> => {
   try {
     const {id} = req.params;
-    const application = await ApplicationModel.findById(id);
-
-    if (!application) {
-      res.status(404).json({message: 'Application not found'});
-      return;
-    }
-
+    const application = await applicationService.getApplicationById(id);
     res.status(200).json(application);
   } catch (err) {
     next(err);
@@ -77,17 +55,7 @@ export const updateApplicationStatus = async (
 ): Promise<void> => {
   try {
     const {id} = req.params;
-    const updatedApplication = await ApplicationModel.findByIdAndUpdate(
-      id,
-      req.body,
-      {new: true},
-    );
-
-    if (!updatedApplication) {
-      res.status(404).json({message: 'Application not found'});
-      return;
-    }
-
+    const updatedApplication = await applicationService.updateApplicationStatus(id, req.body);
     res.status(200).json({
       message: 'Application updated successfully',
       application: updatedApplication,
@@ -105,13 +73,7 @@ export const deleteApplication = async (
 ): Promise<void> => {
   try {
     const {id} = req.params;
-    const deletedApplication = await ApplicationModel.findByIdAndDelete(id);
-
-    if (!deletedApplication) {
-      res.status(404).json({message: 'Application not found'});
-      return;
-    }
-
+    await applicationService.deleteApplication(id);
     res.status(200).json({message: 'Application deleted successfully'});
   } catch (err) {
     next(err);
@@ -126,13 +88,7 @@ export const getApplicationsByStatus = async (
 ): Promise<void> => {
   try {
     const {status} = req.query;
-
-    if (!status) {
-      res.status(400).json({message: 'Status query parameter is required'});
-      return;
-    }
-
-    const applications = await ApplicationModel.find({status});
+    const applications = await applicationService.getApplicationsByStatus(status as string);
     res.status(200).json(applications);
   } catch (err) {
     next(err);
@@ -147,8 +103,7 @@ export const getApplicationsBySeeker = async (
 ): Promise<void> => {
   try {
     const {seekerId} = req.params;
-
-    const applications = await ApplicationModel.find({seekerId});
+    const applications = await applicationService.getApplicationsBySeeker(seekerId);
     res.status(200).json(applications);
   } catch (err) {
     next(err);
