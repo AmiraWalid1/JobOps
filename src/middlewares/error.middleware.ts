@@ -1,30 +1,31 @@
-import {Request, Response, NextFunction} from 'express';
+import {NextFunction, Request, Response} from 'express';
+import {ZodError} from 'zod';
+import {CustomError} from '../utils/customError';
 import {sendResponse} from '../utils/response.util';
 
-interface CustomError extends Error {
-  statusCode?: number;
-  errors?: unknown[];
-}
-
-const defaultMessages: {[key: number]: string} = {
-  400: 'Bad Request',
-  401: 'Unauthorized',
-  404: 'Not Found',
-  500: 'Internal Server Error',
-};
-
-// Error Handler Middleware
 export const errorHandler = (
-  err: CustomError,
-  _req: Request,
+  err: Error | ZodError | CustomError,
+  req: Request,
   res: Response,
-  _next: NextFunction,
+  next: NextFunction,
 ) => {
   console.log('entered error handler');
-  const statusCode = err.statusCode || 500;
-  const message =
-    err.message || defaultMessages[statusCode] || 'Something went wrong!';
-  const errors = err.errors || [];
 
-  sendResponse(res, statusCode, false, message, null, errors);
+  // Handle Zod validation errors
+  if (err instanceof ZodError) {
+    const errors = err.errors.map(e => ({
+      field: e.path.join('.'),
+      message: e.message,
+    }));
+
+    return sendResponse(res, 400, false, 'Validation failed', null, errors);
+  }
+
+  // Handle CustomError instances
+  if (err instanceof CustomError) {
+    return sendResponse(res, err.statusCode, false, err.message, null, []);
+  }
+
+  // Handle generic errors
+  sendResponse(res, 500, false, 'Internal Server Error', null, []);
 };
