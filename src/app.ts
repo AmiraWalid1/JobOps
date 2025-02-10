@@ -1,12 +1,9 @@
 require('dotenv').config();
 import express from 'express';
 import {connectDB} from './utils/db';
-import userRoutes from './routes/user.routes';
-import jobRoutes from './routes/job.routes';
-import applicationRoutes from './routes/application.routes';
 import {errorHandler} from './middlewares/error.middleware';
 import cookieParser from 'cookie-parser';
-import reviewRoutes from './routes/review.routes';
+import routes from './routes';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -19,10 +16,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 // routes
-app.use('/api/users', userRoutes);
-app.use('/api/jobs', jobRoutes);
-app.use('/api/applications', applicationRoutes);
-app.use('/api/reviews', reviewRoutes);
+app.use('/api', routes);
 
 // error handler
 app.use(errorHandler);
