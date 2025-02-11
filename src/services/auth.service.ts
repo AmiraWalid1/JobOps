@@ -1,23 +1,19 @@
-import bcrypt from 'bcrypt';
+import {generateToken} from '../utils/generateToken';
+import {User} from '../validators/user.validator';
 import {UserModel} from '../models/user.model';
 import {CustomError} from '../utils/customError';
-import {generateToken} from '../utils/generateToken';
+import bcrypt from 'bcrypt';
 
-export const register = async (
-  name: string,
-  email: string,
-  password: string,
-  Rate: number,
-  Role: string,
-  phoneNumber: string,
-) => {
+export const register = async (userData: User) => {
+  const {name, email, password, phoneNumber, rate, role} = userData;
+
   // Check if the email is already in use
-  const existingUser = await UserModel.findOne({email}).select('-password');
+  const existingUser = await UserModel.findOne({email});
   if (existingUser) {
     throw new CustomError(400, 'User with this email already exists');
   }
 
-  // Hash Password
+  // Hash the password
   const salt = await bcrypt.genSalt(10);
   const hashedPassword = await bcrypt.hash(password, salt);
 
@@ -26,12 +22,12 @@ export const register = async (
     name,
     email,
     password: hashedPassword,
-    Rate,
-    Role,
-    phoneNumber,
+    phoneNumber: phoneNumber,
+    role: role || 'seeker',
+    rate: rate || 0,
   });
 
-  // Save to DB
+  // Save to the database
   await user.save();
 
   return {user};

@@ -8,16 +8,7 @@ export const registerHandler = async (
   next: NextFunction,
 ): Promise<void> => {
   try {
-    const {name, email, password, Rate, Role, phoneNumber} = req.body;
-
-    const {user} = await register(
-      name,
-      email,
-      password,
-      Rate,
-      Role,
-      phoneNumber,
-    );
+    const {user} = await register(req.body);
 
     sendResponse(res, 201, true, 'User created successfully', {user});
   } catch (error: unknown) {

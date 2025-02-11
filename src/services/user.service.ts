@@ -12,8 +12,8 @@ export const updateProfile = async (
   updateData: {
     name?: string;
     email?: string;
-    Rate?: number;
-    Role?: string;
+    role?: string;
+    rate?: number;
     phoneNumber?: string;
   },
 ) => {
@@ -23,9 +23,9 @@ export const updateProfile = async (
   // Update user data
   user.name = updateData.name || user.name;
   user.email = updateData.email || user.email;
-  user.Rate = updateData.Rate || user.Rate;
-  user.Role = updateData.Role || user.Role;
   user.phoneNumber = updateData.phoneNumber || user.phoneNumber;
+  user.role = updateData.role || user.role;
+  user.rate = updateData.rate || user.rate;
 
   await user.save();
   return user;

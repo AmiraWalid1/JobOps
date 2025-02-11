@@ -11,18 +11,17 @@ export class User {
   @prop({required: true})
   public password!: string;
 
-  @prop()
-  public Rate!: number;
-
-  @prop({default: 'seeker', enum: ['seeker', 'employer']})
-  public Role!: string;
-
   @prop({required: true})
   public phoneNumber!: string;
+
+  @prop({default: 'seeker', enum: ['seeker', 'employer']})
+  public role!: string;
+
+  @prop({default: 0})
+  public rate!: number;
 
   @prop({default: Date.now()})
   public createdAt!: Date;
 }
 
-// إنشاء الـ model
 export const UserModel = getModelForClass(User);

@@ -23,14 +23,14 @@ export const updateProfileHandler = async (
 ): Promise<void> => {
   try {
     const userId = req.user.id;
-    const {name, email, Rate, Role, phoneNumber} = req.body;
+    const {name, email, phoneNumber, rate, role} = req.body;
 
     const updatedUser = await updateProfile(userId, {
       name,
       email,
-      Rate,
-      Role,
       phoneNumber,
+      role,
+      rate,
     });
 
     sendResponse(res, 200, true, 'Profile updated successfully', updatedUser);

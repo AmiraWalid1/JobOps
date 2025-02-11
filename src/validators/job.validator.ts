@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import {z} from 'zod';
 
 // Define the validation schema for job creation
 export const createJobSchema = z.object({
