@@ -110,6 +110,7 @@
   },
   "include": [
     "src/**/*.ts",        // Includes all your source files
-    "src/types/**/*.d.ts" // Ensures custom types are included
+    "src/types/**/*.d.ts", // Ensures custom types are included
+    "src/vitest.config.ts"    // Includes the Vite config file
   ]
 }
