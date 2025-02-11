@@ -14,15 +14,29 @@ export const createJobHandler = async (
   next: NextFunction,
 ): Promise<void> => {
   try {
-    const {title, description, location, salary} = req.body;
+    const {
+      title,
+      type,
+      description,
+      location,
+      experienceLevel,
+      applicationDeadline,
+      salaryMin,
+      salaryMax,
+      requiredSkills} = req.body;
     const employerId = req.user.id; // Assuming the employer is authenticated
 
     const job = await createJob(
       title,
+      type,
       description,
       location,
-      salary,
+      experienceLevel,
       employerId,
+      applicationDeadline,
+      salaryMin,
+      salaryMax,
+      requiredSkills,
     );
     sendResponse(res, 201, true, 'Job created successfully', job);
   } catch (error: unknown) {

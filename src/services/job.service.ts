@@ -3,17 +3,27 @@ import {CustomError} from '../utils/customError';
 
 export const createJob = async (
   title: string,
+  type: string,
   description: string,
   location: string,
-  salary: number,
+  experienceLevel: string,
   employerId: string,
+  applicationDeadline: Date,
+  salaryMin?: number,
+  salaryMax?: number,
+  requiredSkills?: string[]
 ) => {
   const job = new JobModel({
     title,
+    type,
     description,
     location,
-    salary,
+    experienceLevel,
     employerId,
+    applicationDeadline,
+    salaryMin,
+    salaryMax,
+    requiredSkills,
   });
 
   await job.save();
